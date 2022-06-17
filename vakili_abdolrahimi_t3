@@ -1,0 +1,1307 @@
+#include <iostream>
+#include <fstream>
+#include "string.h"
+#include "math.h"
+#include <vector>
+#include "algorithm"
+
+#include <iomanip>
+
+class Term
+{
+    private:
+        float coefficient = 0;
+        int power = 0;
+    public:       
+        void set_coefficient(float);
+        float get_coefficient();
+        void set_power(int);
+        int get_power();
+        Term operator+(float);
+        Term operator+(Term&);
+        Term operator-(float);
+        Term operator-(Term&);
+        Term operator*(float);
+        Term operator*(Term&);
+        Term operator/(float);
+        Term operator/(Term&);
+        bool operator<(float);
+        bool operator<(Term&);
+        bool operator>(float);
+        bool operator>(Term&);
+        bool operator>(const Term&) const;
+        bool operator==(float);
+        bool operator==(Term&);
+        bool operator!=(float);
+        bool operator!=(Term&);
+        bool operator>=(float);
+        bool operator>=(Term&);
+        bool operator<=(float);
+        bool operator<=(Term&);
+        Term operator~();
+        Term& operator+=(Term&);
+        Term& operator-=(Term&);
+        Term& operator*=(Term&);
+        Term& operator/=(Term&);
+        Term& operator=(float);
+        Term& operator=(char*);
+        float operator()(float);
+        Term operator++();
+        Term operator--();
+        Term operator++(int);
+        Term operator--(int);
+};
+bool compare(Term& term1 , Term& term2){
+    if(term1.get_power() > term2.get_power())
+        return true;
+    else if(term1.get_power() < term2.get_power())
+        return false;
+    else{
+        if(term1.get_coefficient() > term2.get_coefficient())
+            return true;
+        else
+            return false;
+    }
+}
+void Term::set_coefficient(float input){
+    coefficient = input;
+}
+float Term::get_coefficient(){
+    return coefficient;
+}
+void Term::set_power(int input){
+    power = input;
+}
+int Term::get_power(){
+    return power;
+}
+Term operator+(float operand, Term& term){
+    Term result;
+    if(term.get_power() == 0){
+        result.set_coefficient(operand + term.get_coefficient());
+        return result;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term operator-(float operand, Term& term){
+    Term result;
+    if(term.get_power() == 0){
+        result.set_coefficient(operand - term.get_coefficient());
+        return result;
+    }
+    else
+        throw "result is not a single term.";
+}
+Term operator*(float operand, Term& term){
+    Term result;
+    result.set_coefficient(operand * term.get_coefficient());
+    result.set_power(term.get_power());
+    return result;
+}
+Term operator/(float operand, Term& term){
+    Term result;
+    result.set_coefficient(operand / term.get_coefficient());
+    result.set_power(-term.get_power());
+    return result;
+}
+bool operator>(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() < operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool operator<(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() > operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool operator==(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() == operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool operator!=(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() != operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool operator>=(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() <= operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool operator<=(float operand, Term& term){
+    if(term.get_power() == 0){
+        if(term.get_coefficient() >= operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+Term Term::operator+(float operand){
+    Term result;
+    if(power == 0){
+        result.set_coefficient(operand + coefficient);
+        return result;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator+(Term& term){
+    Term result;
+    if(power == term.get_power()){
+        result.set_coefficient(term.get_coefficient() + coefficient);
+        result.set_power(power);
+        return result;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator-(float operand){
+    Term result;
+    if(power == 0){
+        result.set_coefficient(coefficient - operand);
+        return result;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator-(Term& term){
+    Term result;
+    if(power == term.get_power()){
+        result.set_coefficient(coefficient - term.get_coefficient());
+        result.set_power(power);
+        return result;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator*(float operand){
+    Term result;
+    result.set_coefficient(operand * coefficient);
+    result.set_power(power);
+    return result;
+}
+Term Term::operator*(Term& term){
+    Term result;
+    result.set_coefficient(term.get_coefficient() * coefficient);
+    result.set_power(power + term.get_power());
+    return result;
+}
+Term Term::operator/(float operand){
+    Term result;
+    result.set_coefficient(coefficient / operand);
+    result.set_power(power);
+    return result;
+}
+Term Term::operator/(Term& term){
+    Term result;
+    result.set_coefficient(coefficient / term.get_coefficient());
+    result.set_power(power - term.get_power());
+    return result;
+}
+bool Term::operator<(float operand){
+    if(power == 0){
+        if(coefficient < operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator<(Term& term){
+    if(power < term.get_power()){
+        if(coefficient < term.get_coefficient())
+            return true;
+        else
+            return false;
+    }
+    else
+        return false;
+}
+bool Term::operator>(float operand){
+    if(power == 0){
+        if(coefficient > operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator>(Term& term){
+    if(power > term.get_power()){
+        if(coefficient > term.get_coefficient())
+            return true;
+        else
+            return false;
+    }
+    else
+        return false;
+}
+bool Term::operator==(float operand){
+    if(power == 0){
+        if(coefficient == operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator==(Term& term){
+    if( power == term.get_power()){
+        if(coefficient == term.get_coefficient())
+            return true;
+        else
+            return false;
+    }
+    else    
+        return false;
+}
+bool Term::operator!=(float operand){
+    if(power == 0){
+        if(coefficient != operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator!=(Term& term){
+    if( power == term.get_power()){
+        if(coefficient != term.get_coefficient())
+            return true;
+        else
+            return false;
+    }
+    else
+        return true;
+}
+bool Term::operator>=(float operand){
+    if(power == 0){
+        if(coefficient >= operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator>=(Term& term){
+    if(*this > term || *this == term)
+        return true;
+    else
+        return false;
+}
+bool Term::operator<=(float operand){
+    if(power == 0){
+        if(coefficient <= operand)
+            return true;
+        else
+            return false;
+    }
+    else
+        throw "cannot compare a float with a term which has non-zero power.";
+}
+bool Term::operator<=(Term& term){
+    if(*this < term || *this == term)
+        return true;
+    else
+        return false;
+}
+Term Term::operator~(){
+    Term result;
+    if(power == 0)
+        result.set_coefficient(0);
+    else{
+        result.set_coefficient(coefficient * power);
+        result.set_power(power - 1);
+    }
+    return result;
+}
+Term& Term::operator+=(Term& term){
+    if(power == term.get_power()){
+        coefficient = term.get_coefficient() + coefficient;
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term& Term::operator-=(Term& term){
+    if(power == term.get_power()){
+        coefficient = coefficient - term.get_coefficient();
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term& Term::operator*=(Term& term){
+    power += term.get_power();
+    coefficient *= term.get_coefficient();
+    return *this;
+}
+Term& Term::operator/=(Term& term){
+    power -= term.get_power();
+    coefficient /= term.get_coefficient();
+    return *this;
+}
+Term& Term::operator=(float input)
+{
+    coefficient = input;
+    power = 0;
+    return *this;
+}
+Term& Term::operator=(char* input){
+    char* token ;  
+    size_t size = sizeof(input);
+    std::string temp(input);
+    if(temp.find('x') != std::string::npos){
+        if(input[0] == '+' && input[1] == 'x'){
+            coefficient = 1.0;
+            if(size > 3)
+                token = strtok(&input[1] , "x");
+        }
+        else if(input[0] == '-' && input[1] == 'x'){
+            coefficient = -1.0;
+            if(size > 3)
+                token = strtok(&input[2] , "x");        
+        }
+        else{
+            token = strtok(input , "x");
+            coefficient = atof(token);
+            token = strtok(NULL , "x");
+        }
+        if(token != NULL)
+            power = atoi(token + 1);
+        else
+            power = 1;
+    }
+    else{
+        coefficient = atof(input);
+        power = 0;
+    }
+    return *this;
+}
+float Term::operator()(float input)
+{
+    return pow(input , power) * coefficient;
+}
+Term Term::operator++(){
+    if(power == 0){
+        coefficient += 1;
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator--(){
+    if(power == 0){
+        coefficient -= 1;
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator++(int){
+    if(power == 0){
+        coefficient += 1;
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+Term Term::operator--(int){
+    if(power == 0){
+        coefficient -= 1;
+        return *this;
+    }
+    else 
+        throw "result is not a single term.";
+}
+std::ostream &operator<<(std::ostream&output , Term& term){
+    int pow = term.get_power();
+    float coef = term.get_coefficient(); 
+    if(pow == 0)
+        output << coef;
+    else
+        output << coef << "x^" << pow;
+    return output;
+}
+std::istream &operator>>(std::istream&input , Term& term){
+    char array[20];
+    input>> array;
+    char* token ;
+	size_t size = sizeof(input);
+    if(array[0] == 'x'){
+        term.set_coefficient(1.0);
+        if(size > 2)
+            token = strtok(&array[1] , "x");
+    }
+    else if(array[0] == '-' && array[1] == 'x'){
+        term.set_coefficient(-1.0);
+        if(size > 3)
+            token = strtok(&array[2] , "x");        
+    }
+    else{
+        token = strtok(array , "x");
+        term.set_coefficient(atof(token));
+        token = strtok(NULL , "x");
+    }
+    if(token != NULL)
+        term.set_power(atoi(token + 1));
+    else
+        term.set_power(1);
+    return input;
+}
+
+class Polynomial{
+    private:
+        std::vector<Term> total;
+    public:
+        void same_power();
+        std::vector<Term>& get_current_polynomial();
+        void set_current_polynomial(Term&);
+        void set_current_polynomial(std::vector<Term>);
+        Polynomial operator+(float);
+        Polynomial operator+(Term&);
+        Polynomial operator+(Polynomial&);
+        Polynomial operator-(float);
+        Polynomial operator-(Term&);
+        Polynomial operator-(Polynomial&);
+        Polynomial operator*(float);
+        Polynomial operator*(Term&);
+        Polynomial operator*(Polynomial&);
+        bool operator<(float);
+        bool operator<(Term&);
+        bool operator<(Polynomial&);
+        bool operator>(float);
+        bool operator>(Term&);
+        bool operator>(Polynomial&);
+        bool operator==(float);
+        bool operator==(Term&);
+        bool operator==(Polynomial&);
+        bool operator!=(float);
+        bool operator!=(Term&);
+        bool operator!=(Polynomial&);
+        bool operator>=(float);
+        bool operator>=(Term&);
+        bool operator>=(Polynomial&);
+        bool operator<=(float);
+        bool operator<=(Term&);
+        bool operator<=(Polynomial&);
+        Polynomial operator~();
+        Polynomial operator+=(Term&);
+        Polynomial operator+=(Polynomial&);
+        Polynomial operator-=(Term&);
+        Polynomial operator-=(Polynomial&);
+        Polynomial operator*=(Term&);
+        Polynomial operator*=(Polynomial&);
+        Polynomial operator=(float);
+        Polynomial operator=(Term&);
+        float operator()(float);
+        Polynomial operator++();
+        Polynomial operator--();
+        Polynomial operator++(int);
+        Polynomial operator--(int);
+};
+std::vector<Term>& Polynomial::get_current_polynomial()
+{
+    return total;
+}
+void Polynomial::set_current_polynomial(Term& term)
+{
+    total.push_back(term);
+}
+void Polynomial::set_current_polynomial(std::vector<Term> list)
+{
+    total = list;
+}
+void Polynomial::same_power(){
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end();){
+        int counter = 1;
+        while(ptr + counter < total.end() && ptr->get_power() == (ptr + counter)->get_power())
+        {
+            ptr->set_coefficient(ptr->get_coefficient() + (ptr + counter)->get_coefficient());
+            total.erase(ptr + counter);
+            counter++;
+        }
+        ptr += counter;
+    }
+}
+Polynomial Polynomial::operator+(float operand)
+{
+    Term term;
+    Polynomial poly;
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        poly.set_current_polynomial(*ptr);
+    }
+    term.set_coefficient(operand);
+    poly.set_current_polynomial(term);
+    std::sort(poly.get_current_polynomial().begin(), poly.get_current_polynomial().end() , compare);
+    same_power();
+    return poly;
+}
+Polynomial Polynomial::operator+(Term& term)
+{
+    Polynomial poly;
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        poly.set_current_polynomial(*ptr);
+    }
+    poly.set_current_polynomial(term);
+    std::sort(poly.get_current_polynomial().begin(), poly.get_current_polynomial().end() , compare);
+    same_power();
+    return poly;
+}
+Polynomial Polynomial::operator+(Polynomial& poly)
+{
+    Polynomial poly1;
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        poly1.set_current_polynomial(*ptr);
+    }
+    poly1.get_current_polynomial().insert(poly1.get_current_polynomial().end() , poly.get_current_polynomial().begin() , poly.get_current_polynomial().end());
+    std::sort(poly1.get_current_polynomial().begin(), poly1.get_current_polynomial().end() , compare);
+    same_power();
+    return poly1;
+}
+Polynomial Polynomial::operator-(float operand)
+{
+    Term term;
+    Polynomial poly;
+    poly.get_current_polynomial() = total;
+    term.set_coefficient(-operand);
+    poly.set_current_polynomial(term);
+    std::sort(poly.get_current_polynomial().begin(), poly.get_current_polynomial().end() , compare);
+    same_power();
+    return poly;
+}
+Polynomial Polynomial::operator-(Term& term)
+{
+    Polynomial poly;
+    Term term1;
+    poly.get_current_polynomial() = total;
+    term1.set_coefficient(-term.get_coefficient());
+    term1.set_power(term.get_power());
+    poly.set_current_polynomial(term1);
+    std::sort(poly.get_current_polynomial().begin(), poly.get_current_polynomial().end() , compare);
+    same_power();
+    return poly;
+}
+Polynomial Polynomial::operator-(Polynomial& poly)
+{
+    Polynomial temp = poly , poly1;
+    poly1.get_current_polynomial() = total;
+    std::vector<Term>::iterator ptr;
+    for (ptr = temp.get_current_polynomial().begin(); ptr < temp.get_current_polynomial().end(); ptr++){
+        ptr->set_coefficient(-ptr->get_coefficient());
+    }
+    poly1.get_current_polynomial().insert(poly1.get_current_polynomial().end() , temp.get_current_polynomial().begin() , temp.get_current_polynomial().end());
+    std::sort(poly1.get_current_polynomial().begin(), poly1.get_current_polynomial().end() , compare);
+    same_power();
+    return poly1;
+}
+Polynomial Polynomial::operator*(float operand)
+{
+    Polynomial poly;   
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        Term term;
+        term.set_coefficient(ptr->get_coefficient() * operand);
+        poly.get_current_polynomial().push_back(term);
+    }
+    return poly;
+}
+Polynomial Polynomial::operator*(Term& term)
+{
+    Polynomial poly;   
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        Term term;
+        term.set_coefficient(ptr->get_coefficient() * term.get_coefficient());
+        term.set_power(ptr->get_power() + term.get_power());
+        poly.get_current_polynomial().push_back(term);
+    }
+    return poly;
+}
+Polynomial Polynomial::operator*(Polynomial& poly)
+{
+    Polynomial poly1;   
+    std::vector<Term>::iterator ptr , ptr1;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        for (ptr = poly.get_current_polynomial().begin(); ptr < poly.get_current_polynomial().end(); ptr++){
+            Term term;
+            term.set_coefficient(ptr->get_coefficient() * term.get_coefficient());
+            term.set_power(ptr->get_power() + term.get_power());
+            poly1.get_current_polynomial().push_back(term);
+        }
+    }
+    return poly1;
+}
+bool Polynomial::operator<(float operand)
+{
+    if(total.size() >= 1){
+        if(total[0].get_power() > 0)
+            return false;
+        else if(total[0].get_power() == 0){
+            if(operand >= total[0].get_coefficient())
+                return true;
+            else
+                return false;
+        }
+        else
+            return true;
+    }
+    else {
+        if(operand >= 0)
+            return true;
+        else
+            return false;
+    }
+}
+bool Polynomial::operator<(Term& term)
+{
+    if(total.size() >= 1){
+        if(total[0].get_power() > term.get_power())
+            return false;
+        else if(total[0].get_power() == term.get_power()){
+            if(term.get_coefficient() > total[0].get_coefficient())
+                return true;
+            else
+                return false;
+        }
+        else
+            return true;
+    }
+    else {
+        if(term.get_power() > 0)
+            return true;
+        else if(term.get_power() == 0){
+            if(term.get_coefficient() > 0)
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+}
+bool Polynomial::operator<(Polynomial& poly)
+{
+    if(total.size() >= poly.get_current_polynomial().size() && poly.get_current_polynomial().size() > 0){
+        if(total[0].get_power() > poly.get_current_polynomial()[0].get_power())
+            return false;
+        else if(total[0].get_power() == poly.get_current_polynomial()[0].get_power()){
+            if(poly.get_current_polynomial()[0].get_coefficient() > total[0].get_coefficient())
+                return true;
+            else
+                return false;
+        }
+        else
+            return true;
+    }
+    else if(total.size() > 0){
+        if(total[0].get_power() > 0)
+            return false;
+        else if(total[0].get_power() == 0){
+            if(total[0].get_coefficient() > 0)
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else if(poly.get_current_polynomial().size() > 0){
+        if(poly.get_current_polynomial()[0].get_power() > 0)
+            return true;
+        else if(poly.get_current_polynomial()[0].get_power() == 0){
+            if(poly.get_current_polynomial()[0].get_coefficient() > 0)
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+}
+bool Polynomial::operator>(float operand){
+    if(total.size() >= 1){
+        if(total[0].get_power() > 0)
+            return true;
+        else if(total[0].get_power() == 0){
+            if(operand >= total[0].get_coefficient())
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else {
+        if(operand >= 0)
+            return false;
+        else
+            return true;
+    }
+}
+bool Polynomial::operator>(Term& term){
+     if(total.size() >= 1){
+        if(total[0].get_power() > term.get_power())
+            return true;
+        else if(total[0].get_power() == term.get_power()){
+            if(term.get_coefficient() > total[0].get_coefficient())
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else {
+        if(term.get_power() > 0)
+            return false;
+        else if(term.get_power() == 0){
+            if(term.get_coefficient() > 0)
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+}
+bool Polynomial::operator>(Polynomial& poly){
+    if(total.size() >= poly.get_current_polynomial().size() && poly.get_current_polynomial().size() > 0){
+        if(total[0].get_power() > poly.get_current_polynomial()[0].get_power())
+            return true;
+        else if(total[0].get_power() == poly.get_current_polynomial()[0].get_power()){
+            if(poly.get_current_polynomial()[0].get_coefficient() >= total[0].get_coefficient())
+                return false;
+            else
+                return true;
+        }
+        else
+            return false;
+    }
+    else if(total.size() > 0){
+        if(total[0].get_power() > 0)
+            return true;
+        else if(total[0].get_power() == 0){
+            if(total[0].get_coefficient() > 0)
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+    else if(poly.get_current_polynomial().size() > 0){
+        if(poly.get_current_polynomial()[0].get_power() > 0)
+            return false;
+        else if(poly.get_current_polynomial()[0].get_power() == 0){
+            if(poly.get_current_polynomial()[0].get_coefficient() > 0)
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else
+        return false;
+}
+bool Polynomial::operator==(float operand){
+    if(total.size() == 1){
+        if(total[0].get_power() == 0){
+            if(total[0].get_coefficient() == operand)
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+}
+bool Polynomial::operator==(Term& term){
+    if(total.size() == 1){
+        if(total[0].get_power() == term.get_power()){
+            if(total[0].get_coefficient() == term.get_coefficient())
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+    else
+        return false;
+}
+bool Polynomial::operator==(Polynomial& poly){
+    if(total.size() == poly.get_current_polynomial().size()){
+        std::vector<Term>::iterator ptr , ptr1;
+        for(ptr1 = total.begin() , ptr = poly.get_current_polynomial().begin();ptr1 < total.end() && ptr < poly.get_current_polynomial().end();ptr++ , ptr1++){
+            if(ptr->get_power() == ptr1->get_power()){
+                if(ptr->get_coefficient() != ptr1->get_coefficient())
+                    return false;
+            }
+            else
+                return false;
+        }  
+        return true;     
+    }
+    else
+        return false;
+}
+bool Polynomial::operator!=(float operand){
+    if(total.size() == 1){
+        if(total[0].get_power() == 0){
+            if(total[0].get_coefficient() == operand)
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else
+        return true;
+}
+bool Polynomial::operator!=(Term& term){
+    if(total.size() == 1){
+        if(total[0].get_power() == term.get_power()){
+            if(total[0].get_coefficient() == term.get_coefficient())
+                return false;
+            else
+                return true;
+        }
+        else
+            return true;
+    }
+    else
+        return true;
+}
+bool Polynomial::operator!=(Polynomial& poly){
+    if(total.size() == poly.get_current_polynomial().size()){
+        std::vector<Term>::iterator ptr , ptr1;
+        for(ptr1 = total.begin() , ptr = poly.get_current_polynomial().begin();ptr1 < total.end() && ptr < poly.get_current_polynomial().end();ptr++ , ptr1++){
+            if(ptr->get_power() == ptr1->get_power()){
+                if(ptr->get_coefficient() != ptr1->get_coefficient())
+                    return true;
+            }
+            else
+                return true;
+        }  
+        return false;     
+    }
+    else
+        return true;
+}
+bool Polynomial::operator>=(float operand){
+    if(*this > operand || *this == operand)
+        return true;
+    else
+        return false;
+}
+bool Polynomial::operator>=(Term& term){
+    if(*this > term || *this == term)
+        return true;
+    else
+        return false;
+}
+bool Polynomial::operator>=(Polynomial& poly){
+    if(*this > poly || *this == poly)
+        return true;
+    else
+        return false;
+}
+bool Polynomial::operator<=(float operand){
+    if(*this < operand || *this == operand)
+        return true;
+    else
+        return false;
+}
+bool Polynomial::operator<=(Term& term){
+    if(*this < term || *this == term)
+        return true;
+    else
+        return false;
+}
+bool Polynomial::operator<=(Polynomial& poly){
+    if(*this < poly || *this == poly)
+        return true;
+    else
+        return false;
+}
+Polynomial Polynomial::operator~()
+{
+    Polynomial poly;
+    std::vector<Term>::iterator ptr;
+    for(ptr = total.begin();ptr < total.end();ptr++){
+        Term term;
+        if(ptr->get_power() == 0)
+            term.set_coefficient(0);
+        else{
+            term.set_coefficient(ptr->get_coefficient() * ptr->get_power());
+            term.set_power(ptr->get_power() - 1);
+        }
+        poly.get_current_polynomial().push_back(term);
+    }
+    return poly;
+}
+Polynomial Polynomial::operator+=(Term& term){
+    total.push_back(term);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator+=(Polynomial& poly){
+    
+    total.insert(total.end() , poly.get_current_polynomial().begin() , poly.get_current_polynomial().end() );
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator-=(Term& term){
+    Term term1;
+    term1.set_coefficient(-term.get_coefficient());
+    term1.set_power(term.get_power());
+    total.push_back(term1);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator-=(Polynomial& poly){
+    std::vector<Term>::iterator ptr;
+    for (ptr = poly.get_current_polynomial().begin(); ptr < poly.get_current_polynomial().end(); ptr++){
+        ptr->set_coefficient(-(ptr->get_coefficient()));
+
+    }
+    total.insert(total.end() , poly.get_current_polynomial().begin() , poly.get_current_polynomial().end());
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator*=(Term& term){ 
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        ptr->set_coefficient(ptr->get_coefficient() * term.get_coefficient());
+        ptr->set_power(ptr->get_power() + term.get_power());
+    }
+    return *this;
+}
+Polynomial Polynomial::operator*=(Polynomial& poly){
+    Polynomial poly1;   
+    std::vector<Term>::iterator ptr , ptr1;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        for (ptr1 = poly.get_current_polynomial().begin(); ptr1 < poly.get_current_polynomial().end(); ptr1++){
+            Term term;
+            term.set_coefficient(ptr->get_coefficient() * ptr1->get_coefficient());
+            term.set_power(ptr->get_power() + ptr1->get_power());
+            poly1.get_current_polynomial().push_back(term);
+        }
+    }
+    total = poly1.get_current_polynomial();
+    return *this;
+}
+Polynomial Polynomial::operator=(float input)
+{
+    total.clear();
+    Term term;
+    term.set_coefficient(input);
+    total.push_back(term);
+    return *this;
+}
+Polynomial Polynomial::operator=(Term& term){
+    total.clear();
+    total.push_back(term);
+    return *this;
+}
+float Polynomial::operator()(float input)
+{
+    float sum = 0.0;
+    std::vector<Term>::iterator ptr;
+    for (ptr = total.begin(); ptr < total.end(); ptr++){
+        sum += ptr->get_coefficient() * pow(input , ptr->get_power());
+    }
+    return sum;
+}
+Polynomial Polynomial::operator++(){
+    Term term;
+    term.set_coefficient(1.0);
+    total.push_back(term);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator--(){
+    Term term;
+    term.set_coefficient(-1.0);
+    total.push_back(term);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator++(int){
+    Term term;
+    term.set_coefficient(1.0);
+    total.push_back(term);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+Polynomial Polynomial::operator--(int){
+    Term term;
+    term.set_coefficient(-1.0);
+    total.push_back(term);
+    std::sort(total.begin(), total.end() , compare);
+    same_power();
+    return *this;
+}
+std::ostream &operator<<(std::ostream&output , Polynomial& poly)
+{
+    if(poly.get_current_polynomial().empty())
+        output << "0" << std::endl;
+    else{
+        for (std::vector<Term>::iterator ptr = poly.get_current_polynomial().begin(); ptr < poly.get_current_polynomial().end(); ptr++){
+            if(ptr->get_coefficient() > 0)
+                output << "+" << *ptr;
+            else if(ptr->get_coefficient() < 0)
+                output << *ptr;
+        }
+        output << std::endl;
+    }
+    return output;
+}
+std::istream &operator>>(std::istream&input , Polynomial& poly)
+{
+    char array[1000];
+    char terms[100][20] = {0 , 0};
+    int position = 0; 
+    char c;
+    input.ignore(2,'\n');
+    while(input.get(c))
+    {
+        if(c == '\n')
+            break;
+        array[position] = c;
+        position++;
+    }
+    std::vector<Term> list;
+    char* token ;
+	token = strtok(array , " ");
+    if(token != NULL){
+        for (int i = 0; ; i++)
+        {
+            strcpy(&terms[i][0] , token);
+            token = strtok(NULL , " ");
+            if(token == NULL)
+                break;
+        }
+    }
+    for (int i = 0; ; i++)
+    {
+        if(terms[i][0] != 0){
+            Term term;
+            term = &terms[i][0];
+            list.push_back(term);
+        }
+        else
+            break;
+    }
+    std::sort(list.begin(), list.end() , compare);
+    poly.set_current_polynomial(list);
+    poly.same_power();
+    return input;
+}
+Polynomial temp;
+void New_Polynomial(){
+    int menu;
+    while(true){
+        Polynomial temp1;
+        system("cls");
+        std::cout << "Polynomial Menu\nCurrent Polynomial = " << temp ;
+        std::cout << "1- Add\n2- Subtract\n3- Multilpy\n4- Derivative\n5- Find Degree\n6- Find value for specific x\n"
+            "7- Compare\n8- Save to a text file\n9- Save to a binary file\n10-      Back to Main Menu" << std::endl;
+        std::cin >> menu;
+        switch (menu)
+        {
+        case 1:
+        {   
+            std::cin >> temp1;
+            temp += temp1;
+            break;
+        }
+        case 2:
+        {   
+            std::cin >> temp1;
+            temp -= temp1;
+            break;
+        }
+        case 3:
+        {   
+            std::cin >> temp1;
+            temp *= temp1;
+            break;
+        }
+        case 4:
+        {   
+            temp = ~temp;
+            break;
+        }
+        case 5:
+        {
+            if(temp.get_current_polynomial().size() > 0){
+                std::cout << temp.get_current_polynomial()[0].get_power();
+            }
+            else
+                std::cout << "1";
+            break;
+        }
+        case 6:
+        {
+            float input;
+            std::cin >> input;
+            std::cout << temp(input);
+            break;
+        }
+        case 7:
+        {
+            std::cin >> temp1;
+            std::cout << "Current Polynomial > Other Polynomial:\t";
+            if(temp > temp1)
+                std::cout << "True" << std::endl;
+            else
+                std::cout << "False" << std::endl;
+            std::cout << "Current Polynomial >= Other Polynomial:\t";
+            if(temp >= temp1)
+                std::cout << "True" << std::endl;
+            else
+                std::cout << "False" << std::endl;
+            std::cout << "Current Polynomial < Other Polynomial:\t";
+            if(temp < temp1)
+                std::cout << "True" << std::endl;
+            else
+                std::cout << "False" << std::endl;
+            std::cout << "Current Polynomial <= Other Polynomial:\t";
+            if(temp <= temp1)
+                std::cout << "True" << std::endl;
+            else
+                std::cout << "False" << std::endl;
+            std::cout << "Current Polynomial == Other Polynomial:\t";
+            if(temp == temp1)
+                std::cout << "True" << std::endl;
+            else
+                std::cout << "False" << std::endl;
+            break;
+        }
+        case 8:
+        {
+            char name[100];
+            std::cout << "name of file:\n";
+            std::cin >> name;
+            std::string filename(name);
+            filename += ".txt";
+            std::ofstream save_file(filename);
+            std::vector<Term>::iterator ptr;
+            for(ptr = temp.get_current_polynomial().begin(); ptr < temp.get_current_polynomial().end();ptr++)
+            {
+                if(ptr->get_power() != 0){
+                    if(ptr->get_coefficient() > 0)
+                        save_file <<  "+" << ptr->get_coefficient() << "x^" << ptr->get_power() << " "; 
+                    else
+                        save_file << ptr->get_coefficient() << "x^" << ptr->get_power() << " "; 
+                }
+                else{
+                    if(ptr->get_coefficient() > 0)
+                        save_file <<  "+" << ptr->get_coefficient() << " "; 
+                    else
+                        save_file << ptr->get_coefficient() << " "; 
+                }
+            }
+            break;
+        }
+        case 9:
+        {
+            char name[100];
+            std::cout << "name of file:\n";
+            std::cin >> name;
+            std::string filename(name);
+            filename += ".bin";
+            std::ofstream save_file(filename , std::ios::out | std::ios::binary);
+            save_file.write(reinterpret_cast<const char*>(&temp.get_current_polynomial()) , temp.get_current_polynomial().size() * sizeof(Term));
+            break;
+        }
+        case 10:
+        {
+            return;
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+        
+    }
+}
+int main()
+{
+    char menu;
+    while(true){
+        system("cls");
+        std::cout << "Main Menu\n1- New Polynomial\n2- Load from test file\n3- Load from binary file\n4- Quit" << std::endl;
+        
+        switch (menu)
+        {
+        case '1':
+            New_Polynomial();
+            break;
+        case '2':
+            break;
+        case '3':
+            break;
+        case '4':
+            return 0;
+            break;
+        default:
+            break;
+        }
+    }
+}
